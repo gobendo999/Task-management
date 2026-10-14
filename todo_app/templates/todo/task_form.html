@@ -1,0 +1,101 @@
+{% extends 'todo/base.html' %}
+
+{% block title %}
+    {% if is_edit %}Edit Task | TaskFlow{% else %}New Task | TaskFlow{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto py-4">
+
+    <!-- Back Navigation -->
+    <a href="{% url 'todo:task_list' %}" class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors mb-6 group">
+        <i class="fa-solid fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>
+        <span>Back to tasks</span>
+    </a>
+
+    <!-- Form Card -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm overflow-hidden">
+        <!-- Card Header -->
+        <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg">
+                    {% if is_edit %}
+                        <i class="fa-solid fa-pen-nib"></i>
+                    {% else %}
+                        <i class="fa-solid fa-plus"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white">
+                        {% if is_edit %}Edit Task{% else %}Create New Task{% endif %}
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        {% if is_edit %}Update details and track your progress.{% else %}Fill in the details to add a task to your board.{% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Body -->
+        <form method="POST" class="p-6 sm:p-8 space-y-6">
+            {% csrf_token %}
+
+            <!-- Task Title Field -->
+            <div class="space-y-2">
+                <label for="{{ form.title.id_for_label }}" class="block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    Task Title <span class="text-rose-500">*</span>
+                </label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <p class="text-xs text-rose-500 flex items-center gap-1.5 mt-1.5">
+                        <i class="fa-solid fa-circle-exclamation text-[11px]"></i>
+                        {{ form.title.errors.0 }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Task Description Field -->
+            <div class="space-y-2">
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    Description <span class="text-xs font-normal text-slate-400 dark:text-slate-500">(Optional)</span>
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <p class="text-xs text-rose-500 flex items-center gap-1.5 mt-1.5">
+                        <i class="fa-solid fa-circle-exclamation text-[11px]"></i>
+                        {{ form.description.errors.0 }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Completed Status Checkbox -->
+            <div class="pt-2">
+                <label class="flex items-center gap-3.5 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/40 cursor-pointer transition-colors">
+                    {{ form.completed }}
+                    <div>
+                        <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Mark as Completed</span>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Toggle whether this task is already accomplished.</p>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Form Action Buttons -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
+                <a href="{% url 'todo:task_list' %}" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    {% if is_edit %}
+                        <i class="fa-solid fa-check text-xs"></i>
+                        <span>Save Changes</span>
+                    {% else %}
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>Create Task</span>
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

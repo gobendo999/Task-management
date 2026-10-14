@@ -1,0 +1,154 @@
+{% extends 'todo/base.html' %}
+
+{% block title %}Sign In | TaskFlow{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto py-4 sm:py-8">
+
+    <!-- Card Wrapper (Indigo + Slate) -->
+    <div class="relative bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-colors duration-200">
+        
+        <!-- Indigo top accent line -->
+        <div class="h-1.5 w-full bg-indigo-600"></div>
+
+        <!-- Header -->
+        <div class="pt-8 pb-6 px-8 text-center bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700/60">
+            <div class="inline-flex mb-3">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-lg shadow-sm shadow-indigo-600/20">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Welcome Back</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
+                Sign in to manage your tasks, track progress, and stay organized
+            </p>
+        </div>
+
+        <!-- Form Body -->
+        <form method="POST" action="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="px-8 pb-8 pt-6 space-y-4" novalidate id="login-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs font-medium border border-rose-200 dark:border-rose-800/60 flex items-center gap-3">
+                    <i class="fa-solid fa-circle-exclamation text-rose-500 text-base shrink-0"></i>
+                    <div>{{ form.non_field_errors.0 }}</div>
+                </div>
+            {% endif %}
+
+            <!-- Username Field -->
+            <div class="space-y-1.5">
+                <label for="{{ form.username.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    Username
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                        <i class="fa-regular fa-user text-sm"></i>
+                    </div>
+                    {{ form.username }}
+                </div>
+                {% if form.username.errors %}
+                    <p class="text-xs text-rose-600 dark:text-rose-400 mt-1 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation text-[11px]"></i>
+                        {{ form.username.errors.0 }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Password Field with Show/Hide Toggle -->
+            <div class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                    <label for="{{ form.password.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                        Password
+                    </label>
+                    <span class="text-[11px] text-slate-400 dark:text-slate-500">Protected</span>
+                </div>
+                
+                <div class="relative">
+                    <!-- Left Icon -->
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                        <i class="fa-solid fa-lock text-sm"></i>
+                    </div>
+
+                    <!-- Input -->
+                    {{ form.password }}
+
+                    <!-- Password Show/Hide Toggle Button -->
+                    <button type="button" 
+                            onclick="togglePasswordVisibility('{{ form.password.id_for_label }}', this)" 
+                            class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus:outline-none cursor-pointer"
+                            title="Show/Hide password" 
+                            aria-label="Toggle password visibility">
+                        <i class="fa-regular fa-eye text-sm"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                    <p class="text-xs text-rose-600 dark:text-rose-400 mt-1 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation text-[11px]"></i>
+                        {{ form.password.errors.0 }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Remember me & Forgot Password -->
+            <div class="flex items-center justify-between pt-1">
+                <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" name="remember_me" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-600 dark:bg-slate-700">
+                    <span class="text-xs text-slate-600 dark:text-slate-400">Remember me</span>
+                </label>
+                <a href="{% url 'password_reset' %}" class="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+                    Forgot password?
+                </a>
+            </div>
+
+            <!-- Submit Button (Indigo) -->
+            <div class="pt-2">
+                <button type="submit" 
+                        class="w-full py-3 px-4 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 shadow-sm shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-right-to-bracket text-xs"></i>
+                    <span>Sign In to TaskFlow</span>
+                </button>
+            </div>
+
+            <!-- Register Link -->
+            <div class="text-center pt-3 border-t border-slate-100 dark:border-slate-700/60">
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    Don't have an account yet? 
+                    <a href="{% url 'register' %}" class="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
+                        <span>Create free account</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<!-- Interactive Password Show / Hide Script -->
+<script>
+    function togglePasswordVisibility(fieldId, toggleBtn) {
+        const inputField = document.getElementById(fieldId);
+        if (!inputField) return;
+
+        const icon = toggleBtn.querySelector('i');
+        const isPassword = inputField.type === 'password';
+
+        inputField.type = isPassword ? 'text' : 'password';
+
+        if (icon) {
+            if (isPassword) {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                toggleBtn.setAttribute('title', 'Hide password');
+                toggleBtn.setAttribute('aria-label', 'Hide password');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                toggleBtn.setAttribute('title', 'Show password');
+                toggleBtn.setAttribute('aria-label', 'Show password');
+            }
+        }
+    }
+</script>
+{% endblock %}

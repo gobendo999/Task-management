@@ -1,0 +1,179 @@
+{% extends 'todo/base.html' %}
+
+{% block title %}User Profile | TaskFlow{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+
+    <!-- Profile Header Card -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6">
+        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-3xl font-bold shadow-sm shadow-indigo-600/20 flex-shrink-0">
+            {{ user.username|slice:":1"|upper }}
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1 text-center sm:text-left space-y-2">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">
+                    {% if user.first_name or user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </h2>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/60 self-center sm:self-auto">
+                    @{{ user.username }}
+                </span>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs text-slate-500 dark:text-slate-400">
+                {% if user.email %}
+                    <span class="flex items-center gap-1.5">
+                        <i class="fa-regular fa-envelope text-slate-400"></i>
+                        {{ user.email }}
+                    </span>
+                {% endif %}
+                {% if profile.location %}
+                    <span class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-location-dot text-slate-400"></i>
+                        {{ profile.location }}
+                    </span>
+                {% endif %}
+                <span class="flex items-center gap-1.5">
+                    <i class="fa-regular fa-calendar text-slate-400"></i>
+                    Member since {{ user.date_joined|date:"M Y" }}
+                </span>
+            </div>
+
+            {% if profile.bio %}
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 pt-1">
+                    {{ profile.bio }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Personal Productivity Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Total Tasks -->
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">My Tasks</p>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ total_tasks }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+        </div>
+
+        <!-- Pending -->
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-amber-600 dark:text-amber-400">In Progress</p>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ pending_tasks }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+        </div>
+
+        <!-- Completed Rate -->
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Accomplished</p>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ completed_tasks }} <span class="text-xs font-normal text-slate-400">({{ completion_rate }}%)</span></h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Form -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm overflow-hidden">
+        <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-700/60">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Edit Profile Details</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Manage your personal information and contact details</p>
+        </div>
+
+        <form method="POST" action="{% url 'profile' %}" class="p-6 sm:p-8 space-y-6">
+            {% csrf_token %}
+
+            <!-- Names -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                        First Name
+                    </label>
+                    {{ u_form.first_name }}
+                    {% if u_form.first_name.errors %}
+                        <p class="text-xs text-rose-500 mt-1">{{ u_form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                        Last Name
+                    </label>
+                    {{ u_form.last_name }}
+                    {% if u_form.last_name.errors %}
+                        <p class="text-xs text-rose-500 mt-1">{{ u_form.last_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Email & Phone -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                        Email Address <span class="text-rose-500">*</span>
+                    </label>
+                    {{ u_form.email }}
+                    {% if u_form.email.errors %}
+                        <p class="text-xs text-rose-500 mt-1">{{ u_form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                        Phone Number
+                    </label>
+                    {{ p_form.phone }}
+                    {% if p_form.phone.errors %}
+                        <p class="text-xs text-rose-500 mt-1">{{ p_form.phone.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="space-y-1.5">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                    Location
+                </label>
+                {{ p_form.location }}
+                {% if p_form.location.errors %}
+                    <p class="text-xs text-rose-500 mt-1">{{ p_form.location.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Bio -->
+            <div class="space-y-1.5">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                    Bio / About Me
+                </label>
+                {{ p_form.bio }}
+                {% if p_form.bio.errors %}
+                    <p class="text-xs text-rose-500 mt-1">{{ p_form.bio.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Submit -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
+                <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all">
+                    <i class="fa-solid fa-floppy-disk text-xs"></i>
+                    <span>Save Profile Changes</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}
